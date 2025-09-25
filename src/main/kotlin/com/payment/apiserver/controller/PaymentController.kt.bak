@@ -1,0 +1,104 @@
+package com.payment.apiserver.controller
+
+import com.payment.apiserver.dto.*
+import com.payment.apiserver.service.PaymentService
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/api/payments")
+class PaymentController(
+    private val paymentService: PaymentService
+) {
+
+    @PostMapping("/prepare")
+    fun preparePayment(
+        @Valid @RequestBody request: PaymentPrepareRequest,
+    ): ResponseEntity<PaymentPrepareResponse> {
+        return try {
+            val response = paymentService.preparePayment(request)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                PaymentPrepareResponse(
+                    success = false,
+                    message = e.message ?: "결제 준비 중 오류가 발생했습니다",
+                    data = null
+                )
+            )
+        }
+    }
+
+    @PostMapping("/approve")
+    fun approvePayment(
+        @Valid @RequestBody request: PaymentApprovalRequest
+    ): ResponseEntity<PaymentApprovalResponse> {
+        return try {
+            val response = paymentService.approvePayment(request)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                PaymentApprovalResponse(
+                    success = false,
+                    message = e.message ?: "결제 승인 중 오류가 발생했습니다",
+                    data = null
+                )
+            )
+        }
+    }
+
+    @PostMapping("/cancel")
+    fun cancelPayment(
+        @Valid @RequestBody request: PaymentCancelRequest
+    ): ResponseEntity<PaymentCancelResponse> {
+        return try {
+            val response = paymentService.cancelPayment(request)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                PaymentCancelResponse(
+                    success = false,
+                    message = e.message ?: "결제 취소 중 오류가 발생했습니다",
+                    data = null
+                )
+            )
+        }
+    }
+
+    @GetMapping("/orders/{userId}")
+    fun getUserOrders(
+        @PathVariable userId: String
+    ): ResponseEntity<PaymentOrderListResponse> {
+        return try {
+            val response = paymentService.getUserOrders(userId)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                PaymentOrderListResponse(
+                    success = false,
+                    message = e.message ?: "주문 목록 조회 중 오류가 발생했습니다",
+                    data = emptyList()
+                )
+            )
+        }
+    }
+
+    @GetMapping("/order/{orderId}")
+    fun getOrderDetail(
+        @PathVariable orderId: String
+    ): ResponseEntity<PaymentOrderDetailResponse> {
+        return try {
+            val response = paymentService.getOrderDetail(orderId)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                PaymentOrderDetailResponse(
+                    success = false,
+                    message = e.message ?: "주문 정보 조회 중 오류가 발생했습니다",
+                    data = null
+                )
+            )
+        }
+    }
+}
