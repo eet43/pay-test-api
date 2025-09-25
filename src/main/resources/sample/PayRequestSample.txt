@@ -1,0 +1,35 @@
+  1. PG 결제 (포인트 미사용)
+
+  POST /api/payments/prepare
+  {
+    "orderId": "ORDER_1704638400000",
+    "amount": 50000,
+    "productName": "테스트 상품",
+    "buyerName": "홍길동",
+    "buyerEmail": "test@example.com",
+    "buyerTel": "010-1234-5678",
+    "timestamp": "1704638400000",
+    "isMobile": false,
+    "usePoints": false,
+    "pointsToUse": 0,
+    "finalPaymentAmount": 50000,
+    "paymentMethod": "PG"
+  }
+
+  2. 하이브리드 결제 (포인트 일부 사용)
+
+  POST /api/payments/prepare
+  {
+    "orderId": "ORDER_1704638400000",
+    "amount": 50000,
+    "productName": "테스트 상품",
+    "buyerName": "홍길동",
+    "buyerEmail": "test@example.com",
+    "buyerTel": "010-1234-5678",
+    "timestamp": "1704638400000",
+    "isMobile": false,
+    "usePoints": true,
+    "pointsToUse": 20000,
+    "finalPaymentAmount": 30000,
+    "paymentMethod": "HYBRID"
+  }
