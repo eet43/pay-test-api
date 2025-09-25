@@ -1,0 +1,232 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: payment-api-server
+
+---
+# Local Environment
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:tcp://localhost:1521/payment
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.payment: DEBUG
+
+payment:
+  pg:
+    providers:
+      - name: inicis
+        weight: 60
+        api-url: ${INICIS_API_URL:https://api.inicis.com}
+        merchant-id: INIpayTest
+        api-key: ItEQKi3rY7uvDS8l
+        sign-key: SU5JTElURV9UUklQTEVERVNfS0VZU1RS
+        hash-key: 3CB8183A4BE283555ACC8363C0360223
+      - name: toss
+        weight: 40
+        api-url: ${TOSS_API_URL:https://api.tosspayments.com}
+        merchant-id: ${TOSS_MERCHANT_ID:tvivarepublica}
+        api-key: ${TOSS_API_KEY:dGVzdF9za19lOTliOGZKMXpJODBmbjVCWUdjWndwSjJ5MkhqUVBr}
+        sign-key: ${TOSS_SIGN_KEY:test_sign_key}
+        hash-key: ${TOSS_HASH_KEY:test_hash_key}
+  minimum-amount: 100
+  cors:
+    allowed-origins: 
+      - http://localhost:3000
+
+---
+# Development Environment
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.payment: INFO
+
+payment:
+  pg:
+    providers:
+      - name: PG_A
+        weight: ${PG_A_WEIGHT:50}
+        api-url: ${PG_A_API_URL}
+        merchant-id: ${PG_A_MERCHANT_ID}
+        api-key: ${PG_A_API_KEY}
+        sign-key: ${PG_A_SIGN_KEY}
+        hash-key: ${PG_A_HASH_KEY}
+      - name: PG_B
+        weight: ${PG_B_WEIGHT:30}
+        api-url: ${PG_B_API_URL}
+        merchant-id: ${PG_B_MERCHANT_ID}
+        api-key: ${PG_B_API_KEY}
+        sign-key: ${PG_B_SIGN_KEY}
+        hash-key: ${PG_B_HASH_KEY}
+      - name: PG_C
+        weight: ${PG_C_WEIGHT:20}
+        api-url: ${PG_C_API_URL}
+        merchant-id: ${PG_C_MERCHANT_ID}
+        api-key: ${PG_C_API_KEY}
+        sign-key: ${PG_C_SIGN_KEY}
+        hash-key: ${PG_C_HASH_KEY}
+  minimum-amount: 100
+  cors:
+    allowed-origins: 
+      - ${FO_DOMAIN}
+
+---
+# Staging Environment
+spring:
+  config:
+    activate:
+      on-profile: stg
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.payment: INFO
+
+payment:
+  pg:
+    providers:
+      - name: PG_A
+        weight: ${PG_A_WEIGHT:50}
+        api-url: ${PG_A_API_URL}
+        merchant-id: ${PG_A_MERCHANT_ID}
+        api-key: ${PG_A_API_KEY}
+        sign-key: ${PG_A_SIGN_KEY}
+        hash-key: ${PG_A_HASH_KEY}
+      - name: PG_B
+        weight: ${PG_B_WEIGHT:30}
+        api-url: ${PG_B_API_URL}
+        merchant-id: ${PG_B_MERCHANT_ID}
+        api-key: ${PG_B_API_KEY}
+        sign-key: ${PG_B_SIGN_KEY}
+        hash-key: ${PG_B_HASH_KEY}
+      - name: PG_C
+        weight: ${PG_C_WEIGHT:20}
+        api-url: ${PG_C_API_URL}
+        merchant-id: ${PG_C_MERCHANT_ID}
+        api-key: ${PG_C_API_KEY}
+        sign-key: ${PG_C_SIGN_KEY}
+        hash-key: ${PG_C_HASH_KEY}
+  minimum-amount: 100
+  cors:
+    allowed-origins: 
+      - ${FO_DOMAIN}
+
+---
+# CBO Environment
+spring:
+  config:
+    activate:
+      on-profile: cbo
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.payment: WARN
+
+payment:
+  pg:
+    providers:
+      - name: PG_A
+        weight: ${PG_A_WEIGHT:50}
+        api-url: ${PG_A_API_URL}
+        merchant-id: ${PG_A_MERCHANT_ID}
+        api-key: ${PG_A_API_KEY}
+        sign-key: ${PG_A_SIGN_KEY}
+        hash-key: ${PG_A_HASH_KEY}
+      - name: PG_B
+        weight: ${PG_B_WEIGHT:30}
+        api-url: ${PG_B_API_URL}
+        merchant-id: ${PG_B_MERCHANT_ID}
+        api-key: ${PG_B_API_KEY}
+        sign-key: ${PG_B_SIGN_KEY}
+        hash-key: ${PG_B_HASH_KEY}
+      - name: PG_C
+        weight: ${PG_C_WEIGHT:20}
+        api-url: ${PG_C_API_URL}
+        merchant-id: ${PG_C_MERCHANT_ID}
+        api-key: ${PG_C_API_KEY}
+        sign-key: ${PG_C_SIGN_KEY}
+        hash-key: ${PG_C_HASH_KEY}
+  minimum-amount: 100
+  cors:
+    allowed-origins: 
+      - ${FO_DOMAIN}
+
+---
+# Production Environment
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.payment: WARN
+    org.springframework.web: WARN
+
+payment:
+  pg:
+    providers:
+      - name: PG_A
+        weight: ${PG_A_WEIGHT:50}
+        api-url: ${PG_A_API_URL}
+        merchant-id: ${PG_A_MERCHANT_ID}
+        api-key: ${PG_A_API_KEY}
+        sign-key: ${PG_A_SIGN_KEY}
+        hash-key: ${PG_A_HASH_KEY}
+      - name: PG_B
+        weight: ${PG_B_WEIGHT:30}
+        api-url: ${PG_B_API_URL}
+        merchant-id: ${PG_B_MERCHANT_ID}
+        api-key: ${PG_B_API_KEY}
+        sign-key: ${PG_B_SIGN_KEY}
+        hash-key: ${PG_B_HASH_KEY}
+      - name: PG_C
+        weight: ${PG_C_WEIGHT:20}
+        api-url: ${PG_C_API_URL}
+        merchant-id: ${PG_C_MERCHANT_ID}
+        api-key: ${PG_C_API_KEY}
+        sign-key: ${PG_C_SIGN_KEY}
+        hash-key: ${PG_C_HASH_KEY}
+  minimum-amount: 100
+  cors:
+    allowed-origins: 
+      - ${FO_DOMAIN}
