@@ -1,0 +1,93 @@
+package com.payment.apiserver.service
+
+import com.payment.apiserver.context.PaymentContext
+import com.payment.apiserver.dto.*
+import com.payment.apiserver.exception.PaymentException
+import com.payment.apiserver.repository.PaymentRepository
+import com.payment.apiserver.strategy.PaymentType
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.format.DateTimeFormatter
+
+@Service
+@Transactional
+class PaymentService(
+    private val paymentContext: PaymentContext,
+    private val paymentRepository: PaymentRepository
+) {
+
+    fun approvePayment(request: PaymentApprovalRequest, paymentType: PaymentType = PaymentType.PG): PaymentApprovalResponse {
+        return paymentContext.executePaymentApproval(request)
+    }
+
+    fun preparePayment(request: PaymentPrepareRequest): PaymentPrepareResponse {
+        return paymentContext.executePaymentPreparation(request)
+    }
+
+    fun cancelPayment(request: PaymentCancelRequest): PaymentCancelResponse {
+        return paymentContext.executePaymentCancel(request)
+    }
+
+    fun getUserOrders(userId: String): PaymentOrderListResponse {
+        return try {
+            val payments = paymentRepository.findByUserIdOrderByCreatedAtDesc(userId)
+
+            val orderData = payments.map { payment ->
+                PaymentOrderData(
+                    orderId = payment.order.id,
+                    tid = payment.pgTid,
+                    productName = payment.order.productName,
+                    amount = payment.amount,
+                    pgName = payment.paymentPgProvider.name,
+                    paymentMethod = payment.paymentMethod.name,
+                    status = payment.status,
+                    createdAt = payment.createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                )
+            }
+
+            PaymentOrderListResponse(
+                success = true,
+                message = "주문 목록 조회 성공",
+                data = orderData
+            )
+        } catch (e: Exception) {
+            PaymentOrderListResponse(
+                success = false,
+                message = "주문 목록 조회 중 오류가 발생했습니다: ${e.message}",
+                data = emptyList()
+            )
+        }
+    }
+
+    fun getOrderDetail(orderId: String): PaymentOrderDetailResponse {
+        return try {
+            val payment = paymentRepository.findByOrderId(orderId)
+                ?: throw Exception("주문 정보를 찾을 수 없습니다: $orderId")
+
+            val orderDetailData = PaymentOrderDetailData(
+                orderId = payment.order.id,
+                tid = payment.pgTid,
+                productName = payment.order.productName,
+                amount = payment.amount,
+                pgName = payment.paymentPgProvider.name,
+                paymentMethod = payment.paymentMethod.name,
+                status = payment.status,
+                createdAt = payment.createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                paymentId = payment.id.toString()
+            )
+
+            PaymentOrderDetailResponse(
+                success = true,
+                message = "주문 정보 조회 성공",
+                data = orderDetailData
+            )
+        } catch (e: Exception) {
+            PaymentOrderDetailResponse(
+                success = false,
+                message = "주문 정보 조회 중 오류가 발생했습니다: ${e.message}",
+                data = null
+            )
+        }
+    }
+
+}
