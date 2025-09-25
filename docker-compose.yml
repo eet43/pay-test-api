@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  h2-db:
+    image: oscarfonts/h2:2.1.214
+    container_name: payment-h2-db
+    ports:
+      - "1521:1521"
+      - "8082:8082"
+    environment:
+      - H2_OPTIONS=-ifNotExists -baseDir /opt/h2-data
+    volumes:
+      - h2-data:/opt/h2-data
+    restart: unless-stopped
+
+
+volumes:
+  h2-data:
